@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SMART Pet Feeder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .low {
+            background-color: #ffcccc;
+            /* Light red */
+        }
+
+        .full {
+            background-color: #ccffcc;
+            /* Light green */
+        }
+
+        button {
+            background-color: #4CAF50;
+            /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            /* Darker green on hover */
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function updateFoodLevel() {
+                $.getJSON('/food_level', function (data) {
+                    $('#food-level').text(data.level);
+                    $('#food-last-update-time').text(data.time);
+
+                    // Update table row class based on food level
+                    if (data.level === 'low') {
+                        $('#food-level-row').addClass('low').removeClass('full');
+                    } else {
+                        $('#food-level-row').addClass('full').removeClass('low');
+                    }
+                });
+            }
+
+            function updateBowlLevel() {
+                $.getJSON('/bowl_level', function (data) {
+                    $('#bowl-level').text(data.level);
+                    $('#bowl-last-update-time').text(data.time);
+
+                    // Update table row class based on bowl level
+                    if (data.level === 'No Food') {
+                        $('#bowl-level-row').addClass('low').removeClass('full');
+                    } else {
+                        $('#bowl-level-row').addClass('full').removeClass('low');
+                    }
+                });
+            }
+
+            setInterval(updateFoodLevel, 5000); // Update every 5 seconds
+            setInterval(updateBowlLevel, 5000); // Update every 5 seconds
+            updateFoodLevel();  // Update immediately on page load
+            updateBowlLevel();  // Update immediately on page load
+        });
+
+        function dispenseFood() {
+            $.get('/dispense', function (data) {
+                // Optional: Notify user or update UI after dispensing
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>SMART Pet Feeder</h1>
+    <table>
+        <tr>
+            <th>Food Level</th>
+            <th>Last Update Time</th>
+        </tr>
+        <tr id="food-level-row">
+            <td id="food-level"></td>
+            <td id="food-last-update-time"></td>
+        </tr>
+        <tr>
+            <th>Bowl Level</th>
+            <th>Last Update Time</th>
+        </tr>
+        <tr id="bowl-level-row">
+            <td id="bowl-level"></td>
+            <td id="bowl-last-update-time"></td>
+        </tr>
+    </table>
+    <button onclick="dispenseFood()">Dispense Food</button>
+</body>
+
+</html>
